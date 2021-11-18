@@ -5,8 +5,8 @@
 //global thread counter
 byte threadCounter = 0;
 
-// arbitrary number of max messageis
-int bufferLength = 2;
+// max messages
+int bufferLength = 3;
 
 /*
 M - thread number;
@@ -56,6 +56,30 @@ proctype generateMessage(){
 		messages[i].MESSAGE = randNum; 
 		threadCounter++;
 	}
+
+
+	//sort the array
+	int mCounter = 0;
+	int m;
+	int n;
+	for (m: 0..bufferLength-1){
+		printf("\nWelcome from m: %d",m);
+			for (n: 0..bufferLength-m-2){
+				printf("\n\tWelcome from n: %d",n);
+				//msg x = messages[n];
+				//messages[n] = messages[n+1];
+				//messages[n+1] = x;
+				printf(" Sort %d >  %d", messages[n].PRIORITY,messages[n+1].PRIORITY);
+			}
+	}
+
+
+ 
+ /*
+printf("\nSort %d >  %d", messages[arrCount].PRIORITY,messages[arrCount+1].PRIORITY);
+ */
+
+
 	//print the generate data;
 	int j;
 	for (j : 0..bufferLength-1) { 
@@ -84,6 +108,10 @@ loop:
 		messages[0].MESSAGE = randNum; 
 		threadCounter++;
 	fi
+
+
+
+
 	
 	int k;
 	for (k : 0..bufferLength-1) { 
@@ -95,9 +123,13 @@ loop:
  		printf("\n");
 	}
 	
-goto loop;
+//goto loop;
 
 }
+
+
+
+
 
 
 init {
