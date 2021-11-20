@@ -121,7 +121,7 @@ printf("\nSort %d >  %d", messages[arrCount].PRIORITY,messages[arrCount+1].PRIOR
   // sending message in channel
   int k;
   for (k : 0..bufferLength-1) {
-    printf("Sending message in element %d in channel\n",k);
+    printf("Sending message in element %d in channel\n",messages[k].MESSAGE);
     data!messages[k];
   }
 
