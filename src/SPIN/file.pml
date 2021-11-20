@@ -6,12 +6,19 @@
 byte threadCounter = 0;
 
 // max messages
-int bufferLength = 3;
+//int bufferLength = 3;
+int bufferLength = 26;
+
+// int for signaling critical section
+int criticalSection = 0;
+
+// channel for sending messages
+
 
 /*
 M - thread number;
 PRIORITY - message priority 0-9;
-MESSAGE - the actual message text MSG1 - MSG10 
+MESSAGE - the actual message text AA - ZZ 
 */
 typedef msg {
 	byte N; 
@@ -19,8 +26,10 @@ typedef msg {
 	mtype:msgText MESSAGE
 };
 
+chan data = [26] of { msg }
+
 //message text data type
-mtype = {MSG10, MSG9, MSG8, MSG7, MSG6, MSG5, MSG4, MSG3, MSG2, MSG1};
+mtype = {ZZ, YY, XX, WW, VV, UU, TT, SS, RR, QQ, PP, OO, NN, MM, LL, KK, JJ, II, HH, GG, FF, EE, DD, CC, BB, AA};
 
 // array of all incoming messages
 msg messages[bufferLength];
@@ -28,7 +37,7 @@ msg messages[bufferLength];
 //random number;
 byte randNum;
 
-//generates a random number from 1-10;
+//generates a random number from 1-26;
 proctype generateNum(){
 if 
 	:: randNum = 1 
@@ -41,6 +50,22 @@ if
 	:: randNum = 8 
 	:: randNum = 9 
 	:: randNum = 10
+  :: randNum = 11
+  :: randNum = 12
+  :: randNum = 13
+  :: randNum = 14
+  :: randNum = 15
+  :: randNum = 16
+  :: randNum = 17
+  :: randNum = 18
+  :: randNum = 19
+  :: randNum = 20
+  :: randNum = 21
+  :: randNum = 22
+  :: randNum = 23
+  :: randNum = 24
+  :: randNum = 25
+  :: randNum = 26
 fi		
 	//printf("The number is %d\n" , randNum);
 }
@@ -56,8 +81,10 @@ proctype generateMessage(){
 		messages[i].MESSAGE = randNum; 
 		threadCounter++;
 	}
+                            
 
 
+/*
 	//sort the array
 	int mCounter = 0;
 	int m;
@@ -72,7 +99,7 @@ proctype generateMessage(){
 				printf(" Sort %d >  %d", messages[n].PRIORITY,messages[n+1].PRIORITY);
 			}
 	}
-
+*/
 
  
  /*
@@ -90,7 +117,31 @@ printf("\nSort %d >  %d", messages[arrCount].PRIORITY,messages[arrCount+1].PRIOR
  		printm(messages[j].MESSAGE);
  		printf("\n");
 	}
+                            
+  // sending message in channel
+  int k;
+  for (k : 0..bufferLength-1) {
+    printf("Sending message in element %d in channel\n",k);
+    data!messages[k];
+  }
 
+  // enter critical section
+  do
+  :: (criticalSection == 0) -> criticalSection = 1; break
+  od
+  
+  // queen reading data from channel
+  msg receivedMessages[bufferLength];
+  
+  int l;
+  for(l : 0..bufferLength - 1){
+    data?receivedMessages[l];
+    printf("Copied message %d from channel\n", receivedMessages[l].MESSAGE);
+  }
+  
+  
+  
+                            
 // testing block for adding an new message after the one with the highest priority is red by the queen
 // assumes that the message with the highest priority is at index 0 in the array
 // as I dont see a better way to implement a priority queue in promela I would say that we have to sort the array by priority 
@@ -113,17 +164,20 @@ loop:
 
 
 	
-	int k;
-	for (k : 0..bufferLength-1) { 
-		printf("\nARR: Thread Index index: %d", messages[k].N);
-		printf("\nARR: MSG PRIORITY index: %d", messages[k].PRIORITY);
- 		printf("\nARR: MSG index: %d\n", messages[k].MESSAGE);
+	int m;
+	for (m : 0..bufferLength-1) { 
+		printf("\nARR: Thread Index index: %d", messages[m].N);
+		printf("\nARR: MSG PRIORITY index: %d", messages[m].PRIORITY);
+ 		printf("\nARR: MSG index: %d\n", messages[m].MESSAGE);
  		printf("ARR: Mesage text: ");
- 		printm(messages[k].MESSAGE);
+ 		printm(messages[m].MESSAGE);
  		printf("\n");
 	}
 	
 //goto loop;
+
+  // end critical section
+  criticalSection = 0;
 
 }
 
