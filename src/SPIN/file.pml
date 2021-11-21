@@ -78,6 +78,7 @@ proctype generateMessage(){
 		/********************/
 		messages[i].N = threadCounter; 
 		messages[i].PRIORITY = randNum; 
+		run generateNum(); // used to assign different priorities for each message
 		messages[i].MESSAGE = randNum; 
 		threadCounter++;
 	}
@@ -198,24 +199,66 @@ loop:
 
 // here is the queen process:
 proctype queen(){
-	do::
+	int lock = 0;
+	int loopCounter = 0;
+	byte highestPriority = 27;
+	int indexRedMsg = -1;
+
+//loop:
+		atomic{
 		if
-		:: (criticalSection == 1) 
-			atomic{
+		:: (criticalSection == 1 && lock == 0) -> 
+		 	lock = 1;
 			printf("****************Hello from queens chamber**********\n");
 			// queen reading data from channel
 		  msg receivedMessages[bufferLength];
 		  int l;
 		  for(l : 0..bufferLength - 1){
 		    data?receivedMessages[l];
-		    printf("Copied message to Queen %d from channel\n", receivedMessages[l].MESSAGE);
-		  } // end loop
+		    printf("Message: ");
+		    printm(receivedMessages[l].MESSAGE);
+		    printf(" with priority: %d delivered to the Queen\n", receivedMessages[l].PRIORITY);
 
-		  criticalSection = 0;
-		  break;
-		}
+		    //checks the message with the lowest priority 
+		    if
+		    :: (highestPriority > receivedMessages[l].PRIORITY ) -> 
+		    	  highestPriority = receivedMessages[l].PRIORITY;
+		    		printf("The new priority is: %d at index: %d\n", highestPriority, l);
+		    		indexRedMsg = l;
+		    :: else skip;
+		    fi
+		  }// end loop
+
+
+		  // set the message as red by changing the priority
+		  receivedMessages[indexRedMsg].PRIORITY = 100;
+
+			// quick prining will delete later   
+			int m;
+			for (m : 0..bufferLength-1) { 
+				printf("\nARR: Thread Index index: %d", receivedMessages[m].N);
+				printf("\nARR: MSG PRIORITY index: %d", receivedMessages[m].PRIORITY);
+		 		printf("\nARR: MSG index: %d\n", receivedMessages[m].MESSAGE);
+		 		printf("ARR: Mesage text: ");
+		 		printm(receivedMessages[m].MESSAGE);
+		 		printf("\n");
+		  }
+
+
+			criticalSection = 0;
+		fi //end if section
+
+
+		/* I was testing a locking mechanisum
+		lock = 0;
+		loopCounter++;
+
+		
+		if
+		:: (loopCounter < 3) -> goto loop
 		fi
-	od
+		*/
+		}
 }
 
 
