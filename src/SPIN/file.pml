@@ -112,13 +112,15 @@ printf("\nSort %d >  %d", messages[arrCount].PRIORITY,messages[arrCount+1].PRIOR
 	int j;
 	for (j : 0..bufferLength-1) { 
 		printf("\nARR: Thread Index index: %d", messages[j].N);
-		printf("\nARR: MSG PRIORITY index: %d", messages[j].PRIORITY);
- 		printf("\nARR: MSG index: %d\n", messages[j].MESSAGE);
+		printf(" ARR: MSG PRIORITY index: %d", messages[j].PRIORITY);
+ 		printf(" ARR: MSG index: %d ", messages[j].MESSAGE);
  		printf("ARR: Mesage text: ");
  		printm(messages[j].MESSAGE);
- 		printf("\n");
+ 		
 	}
-                            
+  
+  printf("\n");
+
   // sending message in channel
   int k;
   for (k : 0..bufferLength-1) {
@@ -229,20 +231,31 @@ proctype queen(){
 		    fi
 		  }// end loop
 
-
 		  // set the message as red by changing the priority
-		  receivedMessages[indexRedMsg].PRIORITY = 100;
+		  receivedMessages[indexRedMsg].PRIORITY = 101;
 
+
+		  //will decrement the priority for all messages with a priority higher than 1
+		  int z;
+			for (z : 0..bufferLength-1) { 
+				if
+				::(receivedMessages[z].PRIORITY > 1) -> receivedMessages[z].PRIORITY = receivedMessages[z].PRIORITY - 1;
+				::else skip;
+				fi
+
+		  }
+		 
 			// quick prining will delete later   
 			int m;
 			for (m : 0..bufferLength-1) { 
 				printf("\nARR: Thread Index index: %d", receivedMessages[m].N);
-				printf("\nARR: MSG PRIORITY index: %d", receivedMessages[m].PRIORITY);
-		 		printf("\nARR: MSG index: %d\n", receivedMessages[m].MESSAGE);
-		 		printf("ARR: Mesage text: ");
+				printf(" MSG PRIORITY index: %d", receivedMessages[m].PRIORITY);
+		 		printf(" MSG index: %d", receivedMessages[m].MESSAGE);
+		 		printf(" ARR: Mesage text: ");
 		 		printm(receivedMessages[m].MESSAGE);
-		 		printf("\n");
+		 		//printf("\n");
 		  }
+		  printf("\n");
 
 
 			criticalSection = 0;
