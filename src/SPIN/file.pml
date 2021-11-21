@@ -1,4 +1,4 @@
-/*run with command: spin -s -r -X -g file.pml */
+/*run with command: spin -X -g file.pml */
  
 
 
@@ -125,11 +125,24 @@ printf("\nSort %d >  %d", messages[arrCount].PRIORITY,messages[arrCount+1].PRIOR
     data!messages[k];
   }
 
+  //claggs the critical section as takes
+  criticalSection = 1;
+
+
+
+ /****** Matt this is your code I did not delete anything but I would immagine that 
+ we have to move the portion for updating the status and marking the consumed message in 
+ the other process ******
   // enter critical section
   do
   :: (criticalSection == 0) -> criticalSection = 1; break
   od
+
+
   
+    
+	//moving this block to a new section
+
   // queen reading data from channel
   msg receivedMessages[bufferLength];
   
@@ -138,9 +151,10 @@ printf("\nSort %d >  %d", messages[arrCount].PRIORITY,messages[arrCount+1].PRIOR
     data?receivedMessages[l];
     printf("Copied message %d from channel\n", receivedMessages[l].MESSAGE);
   }
+
+   
   
-  
-  
+
                             
 // testing block for adding an new message after the one with the highest priority is red by the queen
 // assumes that the message with the highest priority is at index 0 in the array
@@ -161,9 +175,6 @@ loop:
 	fi
 
 
-
-
-	
 	int m;
 	for (m : 0..bufferLength-1) { 
 		printf("\nARR: Thread Index index: %d", messages[m].N);
@@ -178,16 +189,40 @@ loop:
 
   // end critical section
   criticalSection = 0;
+  
+
+  ******************/
 
 }
 
 
+// here is the queen process:
+proctype queen(){
+	do::
+		if
+		:: (criticalSection == 1) 
+			atomic{
+			printf("****************Hello from queens chamber**********\n");
+			// queen reading data from channel
+		  msg receivedMessages[bufferLength];
+		  int l;
+		  for(l : 0..bufferLength - 1){
+		    data?receivedMessages[l];
+		    printf("Copied message to Queen %d from channel\n", receivedMessages[l].MESSAGE);
+		  } // end loop
 
+		  criticalSection = 0;
+		  break;
+		}
+		fi
+	od
+}
 
 
 
 init {
 	run generateMessage();
+	run queen();
 }
 
  

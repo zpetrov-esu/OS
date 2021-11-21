@@ -19,8 +19,10 @@ active proctype example(){
 
 		now.count++;
     	}
-	printf("%d", now.count);
+	
     fclose(f);
 
-	}
+	}	
+
+	c_code {printf("%d", now.count);}
 }
