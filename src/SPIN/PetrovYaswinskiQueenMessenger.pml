@@ -14,6 +14,8 @@ int bufferLength = 26;
 // int for signaling critical section
 int criticalSection = 0;
 
+// counter for loop in queen process
+int loopCounter = 0;
 
 /*
 M - thread number;
@@ -93,14 +95,11 @@ proctype generateMessage(){
 
 // here is the queen process:
 proctype queen(){
-	byte highestPriority = 27;
-	int indexRedMsg = -1;
-  
-	// counter for loop for reading all messages
-	int loopCounter = 0;
-
 	do
 	:: loopCounter < bufferLength ->
+		byte highestPriority = 27;
+		int indexRedMsg = -1;
+  
 		// beginning of critical section using counting semaphore
 		criticalSection = 1;
 
@@ -159,18 +158,14 @@ proctype queen(){
 			// set the message as red by changing the priority
 			receivedMessages[indexRedMsg].PRIORITY = 101;
 
-			loopCounter++;
-      
 			// repopulate channel
 			int k;
 			for (k : 0..bufferLength-1) {
 				data!receivedMessages[k];
 			}
 
-			// reset variables for next iteration
-			highestPriority = 27;
-			indexRedMsg = -1;
-		
+			loopCounter++;
+
 	}
 	od
 }
