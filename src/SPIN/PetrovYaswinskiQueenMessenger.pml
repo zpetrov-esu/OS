@@ -17,9 +17,9 @@ int criticalSection = 0;
 int loopCounter = 0;
 
 /*
-M - thread number;
-PRIORITY - message priority 0-26;
-MESSAGE - the actual message text AA - ZZ 
+* M - thread number;
+* PRIORITY - message priority 0-26;
+* MESSAGE - the actual message text AA - ZZ 
 */
 typedef msg {
 	byte N; 
@@ -30,16 +30,16 @@ typedef msg {
 // channel for sending messages
 chan data = [26] of { msg }
 
-//message text data type
+// message text data type
 mtype = {ZZ, YY, XX, WW, VV, UU, TT, SS, RR, QQ, PP, OO, NN, MM, LL, KK, JJ, II, HH, GG, FF, EE, DD, CC, BB, AA};
 
 // array of all incoming messages
 msg messages[bufferLength];
 
-//random number;
+// random number;
 byte randNum;
 
-//generates a random number from 1-26;
+// generates a random number from 1-26;
 proctype generateNum(){
 	if 
 	:: randNum = 1 
@@ -92,10 +92,11 @@ proctype generateMessage(){
 }
 
 
-// here is the queen process:
+// queen processes for reading channel and determining message to consume
 proctype queen(){
 	do
 	:: loopCounter != bufferLength ->
+		// default priority and consumed message index for each iteration
 		byte highestPriority = 27;
 		int indexRedMsg = -1;
   
@@ -112,7 +113,7 @@ proctype queen(){
 				for(l : 0..bufferLength - 1){
 		    			data?receivedMessages[l];
 
-		    			//checks the message with the lowest priority 
+		    			// checks the message with the lowest priority 
 		    			if
 		    			:: (highestPriority > receivedMessages[l].PRIORITY ) -> 
 		    				highestPriority = receivedMessages[l].PRIORITY;
@@ -121,7 +122,7 @@ proctype queen(){
 					fi
 				}
 
-				//will decrement the priority for all messages with a priority higher than 1 and less than 101
+				// decrement the priority for all messages with a priority higher than 1 and less than 101
 				int z;
 				for (z : 0..bufferLength-1) { 
 					if
@@ -130,13 +131,14 @@ proctype queen(){
 					fi
 
 		  		}
+			fi
 
-				// end of critical section
-				criticalSection = 0;
-    
-			fi //end if section
+			// end of critical section
+			criticalSection = 0;
+
 
 			// remainder section
+
 			// print messages with priorities
 			printf("Messages received from channel:\n"); 
 			int m;
