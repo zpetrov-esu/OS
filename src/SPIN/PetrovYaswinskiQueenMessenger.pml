@@ -144,9 +144,9 @@ proctype queen(){
 			printf("Messages received from channel:\n"); 
 			int m;
 			for (m : 0..bufferLength-1) { 
-				printf(" MSG PRIORITY index: %d", receivedMessages[m].PRIORITY);
-		 		printf(" MSG index: %d", receivedMessages[m].MESSAGE);
-				printf(" ARR: Mesage text: ");
+				printf(" Message priority index: %d", receivedMessages[m].PRIORITY);
+		 		printf(" Message index: %d", receivedMessages[m].MESSAGE);
+				printf(" Mesage text: ");
 		 		printm(receivedMessages[m].MESSAGE);
 				printf("\n");
 			}
