@@ -88,9 +88,6 @@ proctype generateMessage(){
 	for (k : 0..bufferLength-1) {
 		data!messages[k];
 	}
-
-	//claggs the critical section as takes
-	criticalSection = 1;
 }
 
 
@@ -102,8 +99,11 @@ proctype queen(){
 	// counter for loop for reading all messages
 	int loopCounter = 0;
 
-	//do
-	//:: loopCounter < 26 ->
+	do
+	:: loopCounter < bufferLength ->
+		// beginning of critical section using counting semaphore
+		criticalSection = 1;
+
 		atomic{
 			if
 			:: (criticalSection == 1) -> 
@@ -124,11 +124,11 @@ proctype queen(){
 				}
 
 
-				//will decrement the priority for all messages with a priority higher than 1
+				//will decrement the priority for all messages with a priority higher than 1 and less than 101
 				int z;
 				for (z : 0..bufferLength-1) { 
 					if
-					::(receivedMessages[z].PRIORITY > 1) -> receivedMessages[z].PRIORITY = receivedMessages[z].PRIORITY - 1;
+					::(receivedMessages[z].PRIORITY > 1 && receivedMessages[z].PRIORITY < 101) -> receivedMessages[z].PRIORITY = receivedMessages[z].PRIORITY - 1;
 					::else skip;
 					fi
 
@@ -146,7 +146,7 @@ proctype queen(){
 			for (m : 0..bufferLength-1) { 
 				printf(" MSG PRIORITY index: %d", receivedMessages[m].PRIORITY);
 		 		printf(" MSG index: %d", receivedMessages[m].MESSAGE);
-		 		printf(" ARR: Mesage text: ");
+				printf(" ARR: Mesage text: ");
 		 		printm(receivedMessages[m].MESSAGE);
 				printf("\n");
 			}
@@ -160,11 +160,19 @@ proctype queen(){
 			receivedMessages[indexRedMsg].PRIORITY = 101;
 
 			loopCounter++;
+      
+			// repopulate channel
+			int k;
+			for (k : 0..bufferLength-1) {
+				data!receivedMessages[k];
+			}
 
-		
+			// reset variables for next iteration
+			highestPriority = 27;
+			indexRedMsg = -1;
 		
 	}
-	//od
+	od
 }
 
 
