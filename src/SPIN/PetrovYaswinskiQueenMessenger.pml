@@ -4,7 +4,6 @@
  * November 23, 2021 */
  
 
-
 //global thread counter
 byte threadCounter = 0;
 
@@ -96,7 +95,7 @@ proctype generateMessage(){
 // here is the queen process:
 proctype queen(){
 	do
-	:: loopCounter < bufferLength ->
+	:: loopCounter != bufferLength ->
 		byte highestPriority = 27;
 		int indexRedMsg = -1;
   
@@ -122,7 +121,6 @@ proctype queen(){
 					fi
 				}
 
-
 				//will decrement the priority for all messages with a priority higher than 1 and less than 101
 				int z;
 				for (z : 0..bufferLength-1) { 
@@ -143,7 +141,7 @@ proctype queen(){
 			printf("Messages received from channel:\n"); 
 			int m;
 			for (m : 0..bufferLength-1) { 
-				printf(" Message priority index: %d", receivedMessages[m].PRIORITY);
+				printf(" Message priority: %d", receivedMessages[m].PRIORITY);
 		 		printf(" Message index: %d", receivedMessages[m].MESSAGE);
 				printf(" Mesage text: ");
 		 		printm(receivedMessages[m].MESSAGE);
@@ -170,11 +168,8 @@ proctype queen(){
 	od
 }
 
-
-
 init {
 	run generateMessage();
 	run queen();
 }
 
- 
