@@ -124,7 +124,6 @@ proctype queen(){
 
 				// decrement the priority for all messages with a priority higher than 1 and less than 101
 				msg receivedMessagesNewPriorities[bufferLength];
-				msg tempMsg;
 				int z;
 				for (z : 0..bufferLength-1) {
 					receivedMessagesNewPriorities[z].N = receivedMessages[z].N;
