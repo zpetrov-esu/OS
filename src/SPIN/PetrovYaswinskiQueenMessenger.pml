@@ -97,15 +97,15 @@ proctype queen(){
 	do
 	:: loopCounter != bufferLength ->
 		// default priority and consumed message index for each iteration
-		byte highestPriority = 27;
+		byte lowestPriority = 27;
 		int indexRedMsg = -1;
   
-		// beginning of critical section using counting semaphore
-		criticalSection = 1;
-
 		atomic{
 			if
-			:: (criticalSection == 1) -> 
+			:: (criticalSection == 0) ->
+				// set critical section to active
+				criticalSection = 1; 
+
 				printf("****************Entering Queen's Chamber**********\n");
 				// queen reading data from channel
 		  		msg receivedMessages[bufferLength];
@@ -115,28 +115,31 @@ proctype queen(){
 
 		    			// checks the message with the lowest priority 
 		    			if
-		    			:: (highestPriority > receivedMessages[l].PRIORITY ) -> 
-		    				highestPriority = receivedMessages[l].PRIORITY;
+		    			:: (lowestPriority > receivedMessages[l].PRIORITY ) -> 
+		    				lowestPriority = receivedMessages[l].PRIORITY;
 		    				indexRedMsg = l;
 		    			:: else skip;
 					fi
 				}
 
 				// decrement the priority for all messages with a priority higher than 1 and less than 101
+				msg receivedMessagesNewPriorities[bufferLength];
+				msg tempMsg;
 				int z;
-				for (z : 0..bufferLength-1) { 
+				for (z : 0..bufferLength-1) {
+					receivedMessagesNewPriorities[z].N = receivedMessages[z].N;
+					receivedMessagesNewPriorities[z].PRIORITY = receivedMessages[z].PRIORITY;
+					receivedMessagesNewPriorities[z].MESSAGE = receivedMessages[z].MESSAGE;
 					if
-					::(receivedMessages[z].PRIORITY > 1 && receivedMessages[z].PRIORITY < 101) -> receivedMessages[z].PRIORITY = receivedMessages[z].PRIORITY - 1;
+					::(receivedMessagesNewPriorities[z].PRIORITY > 1 && receivedMessagesNewPriorities[z].PRIORITY < 101) -> receivedMessagesNewPriorities[z].PRIORITY = receivedMessagesNewPriorities[z].PRIORITY - 1;
 					::else skip;
 					fi
 
 		  		}
+				criticalSection = 0;
 			fi
 
-			// end of critical section
-			criticalSection = 0;
-
-
+			
 			// remainder section
 
 			// print messages with priorities
@@ -156,12 +159,12 @@ proctype queen(){
 			printf("\n\n");
       
 			// set the message as red by changing the priority
-			receivedMessages[indexRedMsg].PRIORITY = 101;
+			receivedMessagesNewPriorities[indexRedMsg].PRIORITY = 101;
 
 			// repopulate channel
 			int k;
 			for (k : 0..bufferLength-1) {
-				data!receivedMessages[k];
+				data!receivedMessagesNewPriorities[k];
 			}
 
 			loopCounter++;
